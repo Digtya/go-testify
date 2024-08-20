@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestMainHandlerWhenOK(t *testing.T) {
@@ -16,13 +17,8 @@ func TestMainHandlerWhenOK(t *testing.T) {
 	handler := http.HandlerFunc(mainHandle)
 	handler.ServeHTTP(responseRecorder, req)
 
-	// здесь нужно добавить необходимые проверки
-	if status := responseRecorder.Code; status != http.StatusOK {
-		t.Fatalf("expected status code: %d, got %d", http.StatusOK, status)
-	}
-	body := responseRecorder.Body.String()
-	list := strings.Split(body, ",")
-	assert.NotEmpty(t, list)
+	require.Equal(t, http.StatusOK, responseRecorder.Code)
+	assert.NotEmpty(t, responseRecorder.Body)
 }
 
 func TestMainHandlerWhenWrongCity(t *testing.T) {
@@ -45,6 +41,7 @@ func TestMainHandlerWhenCountMoreThanTotal(t *testing.T) {
 	req := httptest.NewRequest("GET", "/cafe?count=10&city=moscow", nil)
 
 	responseRecorder := httptest.NewRecorder()
+	require.Equal(t, http.StatusOK, responseRecorder.Code)
 	handler := http.HandlerFunc(mainHandle)
 	handler.ServeHTTP(responseRecorder, req)
 
